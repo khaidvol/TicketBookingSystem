@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--    package dao - configured with xml-->
+    <!--    package services - configured with annotations-->
+    <context:component-scan base-package="services"/>
+
+    <context:property-placeholder local-override="true" location="classpath:application.properties"/>
+
+    <bean id="bookingStorage" class="dao.BookingStorage"
+          p:appDataPath="${app.data}" init-method="init"/>
+
+    <bean id="userDao" class="dao.UserDao"
+          p:bookingStorage-ref="bookingStorage">
+<!--        <property name="bookingStorage" ref="bookingStorage"/>-->
+    </bean>
+
+    <bean id="eventDao" class="dao.EventDao"
+          p:bookingStorage-ref="bookingStorage">
+    </bean>
+
+    <bean id="ticketDao" class="dao.TicketDao"
+          p:bookingStorage-ref="bookingStorage">
+    </bean>
+
+</beans>
