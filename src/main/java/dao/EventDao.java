@@ -3,14 +3,12 @@ package dao;
 import model.Event;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-@Service
 public class EventDao {
 
   private Log logger = LogFactory.getLog(EventDao.class);

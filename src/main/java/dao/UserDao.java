@@ -3,12 +3,10 @@ package dao;
 import model.User;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Repository
 public class UserDao {
 
   private Log logger = LogFactory.getLog(UserDao.class);
