@@ -1,23 +1,19 @@
 package dao;
 
-import model.EventImpl;
-import model.TicketImpl;
+import dao.implementation.UserDao;
 import model.User;
-import model.UserImpl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import storage.BookingStorage;
 
 public class UserDaoTest {
 
-  ClassPathXmlApplicationContext context;
+  ApplicationContext context;
   UserDao userDao;
 
   public UserDaoTest() {}
@@ -28,11 +24,12 @@ public class UserDaoTest {
     userDao = context.getBean(UserDao.class);
   }
 
+/*
   @Test
   public void createUserTest() {
     User user = Mockito.mock(User.class);
     Mockito.when(user.getId()).thenReturn(1L);
-    Assert.assertEquals(user, userDao.createUser(user));
+    Assert.assertEquals(user, userDao.create(user));
   }
 
   @Test
@@ -41,8 +38,8 @@ public class UserDaoTest {
     Mockito.when(user1.getId()).thenReturn(1L);
     User user2 = Mockito.mock(User.class);
     Mockito.when(user2.getId()).thenReturn(1L);
-    Assert.assertEquals(user1, userDao.createUser(user1));
-    Assert.assertNull(userDao.createUser(user2));
+    Assert.assertEquals(user1, userDao.create(user1));
+    Assert.assertNull(userDao.create(user2));
   }
 
   @Test
@@ -51,15 +48,15 @@ public class UserDaoTest {
     Mockito.when(user1.getEmail()).thenReturn("test@gmail.com");
     User user2 = Mockito.mock(User.class);
     Mockito.when(user2.getEmail()).thenReturn("test@gmail.com");
-    Assert.assertEquals(user1, userDao.createUser(user1));
-    Assert.assertNull(userDao.createUser(user2));
+    Assert.assertEquals(user1, userDao.create(user1));
+    Assert.assertNull(userDao.create(user2));
   }
 
   @Test
   public void readUserByIdTest() {
     User user1 = Mockito.mock(User.class);
     Mockito.when(user1.getId()).thenReturn(1L);
-    userDao.createUser(user1);
+    userDao.create(user1);
     Assert.assertEquals(user1, userDao.readUserById(user1.getId()));
   }
 
@@ -158,4 +155,31 @@ public class UserDaoTest {
     EventImpl.setIdCounter(1);
     TicketImpl.setIdCounter(1);
   }
+*/
+
+
+  /**
+   * **************************************************************************************
+   */
+
+  @Test
+  public void createTest(){
+    User user = Mockito.mock(User.class);
+    Assert.assertEquals(user, userDao.create(user));
+  }
+
+  @Test
+  public void readTest(){
+    User user = Mockito.mock(User.class);
+    Mockito.when(user.getId()).thenReturn(1L);
+    userDao.create(user);
+    Assert.assertEquals(user, userDao.read(1L));
+  }
+
+  @After
+  public void cleanUp() {
+    BookingStorage bookingStorage = context.getBean(BookingStorage.class);
+    bookingStorage.getUsers().clear();
+  }
+
 }

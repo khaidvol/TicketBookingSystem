@@ -1,8 +1,13 @@
-package services;
+package service;
 
-import dao.BookingStorage;
+import storage.BookingStorage;
 import facade.BookingFacade;
-import model.*;
+import facade.BookingFacadeImpl;
+import model.Event;
+import model.Ticket;
+import model.User;
+import model.implementation.EventImpl;
+import model.implementation.UserImpl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,18 +19,18 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class BookingServiceTest {
+public class BookingFacadeImplTest {
 
   ClassPathXmlApplicationContext context;
   BookingFacade bookingService;
 
-  public BookingServiceTest() {}
+  public BookingFacadeImplTest() {}
 
   @Before
   public void setUp() {
 
     context = new ClassPathXmlApplicationContext("applicationContext.xml");
-    bookingService = context.getBean(BookingService.class);
+    bookingService = context.getBean(BookingFacadeImpl.class);
   }
 
   @Test
@@ -153,8 +158,5 @@ public class BookingServiceTest {
     bookingStorage.getUsers().clear();
     bookingStorage.getTickets().clear();
     bookingStorage.getEvents().clear();
-    UserImpl.setIdCounter(1);
-    EventImpl.setIdCounter(1);
-    TicketImpl.setIdCounter(1);
   }
 }

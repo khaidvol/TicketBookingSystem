@@ -8,25 +8,22 @@
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <!--    package dao - configured with xml-->
-    <!--    package services - configured with annotations-->
-    <context:component-scan base-package="services"/>
-
+    <context:component-scan base-package="service, facade"/>
     <context:property-placeholder local-override="true" location="classpath:application.properties"/>
 
-    <bean id="bookingStorage" class="dao.BookingStorage"
+    <bean id="bookingStorage" class="storage.BookingStorage"
           p:appDataPath="${app.data}" init-method="init"/>
 
-    <bean id="userDao" class="dao.UserDao"
+    <bean id="userDao" class="dao.implementation.UserDao"
           p:bookingStorage-ref="bookingStorage">
 <!--        <property name="bookingStorage" ref="bookingStorage"/>-->
     </bean>
 
-    <bean id="eventDao" class="dao.EventDao"
+    <bean id="eventDao" class="dao.implementation.EventDao"
           p:bookingStorage-ref="bookingStorage">
     </bean>
 
-    <bean id="ticketDao" class="dao.TicketDao"
+    <bean id="ticketDao" class="dao.implementation.TicketDao"
           p:bookingStorage-ref="bookingStorage">
     </bean>
 

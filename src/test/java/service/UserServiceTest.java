@@ -1,10 +1,8 @@
-package services;
+package service;
 
-import dao.BookingStorage;
-import model.EventImpl;
-import model.TicketImpl;
+import storage.BookingStorage;
 import model.User;
-import model.UserImpl;
+import model.implementation.UserImpl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -78,8 +76,5 @@ public class UserServiceTest {
     bookingStorage.getUsers().clear();
     bookingStorage.getTickets().clear();
     bookingStorage.getEvents().clear();
-    UserImpl.setIdCounter(1);
-    EventImpl.setIdCounter(1);
-    TicketImpl.setIdCounter(1);
   }
 }

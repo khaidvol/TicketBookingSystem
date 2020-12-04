@@ -1,6 +1,9 @@
-package dao;
+package storage;
 
 import model.*;
+import model.implementation.EventImpl;
+import model.implementation.TicketImpl;
+import model.implementation.UserImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -30,19 +33,23 @@ public class BookingStorage {
   public void init() {
     try (BufferedReader bufferedReader = new BufferedReader(new FileReader(appDataPath))) {
       String bufferedLine;
+
       while ((bufferedLine = bufferedReader.readLine()) != null) {
         String[] line = bufferedLine.split(", ");
+
         switch (line[0]) {
           case "User":
             User user = new UserImpl(line[1], line[2]);
             users.put(user.getId(), user);
             logger.info("User loaded from file: " + user.toString());
             break;
+
           case "Event":
             Event event = new EventImpl(line[1], new SimpleDateFormat("yyyy-MM-dd").parse(line[2]));
             events.put(event.getId(), event);
             logger.info("Event loaded from file: " + event.toString());
             break;
+
           case "Ticket":
             Ticket ticket =
                 new TicketImpl(
@@ -52,10 +59,12 @@ public class BookingStorage {
                     Ticket.Category.valueOf(line[4]));
             logger.info("Ticket loaded from file: " + ticket.toString());
             break;
+
           default:
             break;
         }
       }
+
     } catch (IOException | ParseException e) {
       e.printStackTrace();
     }
