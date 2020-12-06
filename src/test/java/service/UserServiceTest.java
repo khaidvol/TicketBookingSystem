@@ -1,80 +1,88 @@
 package service;
 
-import storage.BookingStorage;
 import model.User;
-import model.implementation.UserImpl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import java.util.Arrays;
-import java.util.List;
+import storage.BookingStorage;
 
 public class UserServiceTest {
 
-  ClassPathXmlApplicationContext context;
+  ApplicationContext context;
+  BookingStorage bookingStorage;
   UserService userService;
+  User user;
 
   public UserServiceTest() {}
 
   @Before
   public void setUp() {
-    context = new ClassPathXmlApplicationContext("applicationContext.xml");
+    context = new ClassPathXmlApplicationContext("applicationContextTest.xml");
     userService = context.getBean(UserService.class);
+    bookingStorage = context.getBean("testingBookingStorage", BookingStorage.class);
+    user = Mockito.mock(User.class);
   }
 
   @Test
   public void getUserByIdTest() {
-    User user = Mockito.mock(User.class);
-    userService.createUser(user);
+    Assert.assertEquals(user, userService.createUser(user));
     Assert.assertEquals(user, userService.getUserById(user.getId()));
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void getNotExistingUserByIdTest() {
+    userService.getUserById(1000L);
   }
 
   @Test
   public void getUserByEmailTest() {
-    User user = new UserImpl("Test", "test@gmail.com");
-    userService.createUser(user);
-    Assert.assertEquals(user, userService.getUserByEmail(user.getEmail()));
+    Assert.assertNotNull(userService.getUserByEmail("jack@gmail.com"));
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void getNotExistingUserByEmailTest() {
+    userService.getUserByEmail("test@gmail.com");
   }
 
   @Test
   public void getUsersByNameTest() {
-    User user1 = new UserImpl("Test 1", "test1@gmail.com");
-    User user2 = new UserImpl("Test 2", "test2@gmail.com");
-    List<User> users = Arrays.asList(user1, user2);
-    userService.createUser(user1);
-    userService.createUser(user2);
-    Assert.assertEquals(users, userService.getUsersByName("Test", 1, 1));
+    Assert.assertNotNull(userService.getUsersByName("Jack", 1, 1));
   }
 
   @Test
   public void createUserTest() {
-    User user = Mockito.mock(User.class);
     Assert.assertEquals(user, userService.createUser(user));
   }
 
+  @Test(expected = IllegalStateException.class)
+  public void createUserWithUsedEmailTest() {
+    Mockito.when(user.getEmail()).thenReturn("jack@gmail.com");
+    userService.createUser(user);
+  }
+
   @Test
-  public void updatedUserTest() {
-    User user = Mockito.mock(User.class);
+  public void updateUserTest() {
     userService.createUser(user);
     Assert.assertEquals(user, userService.updateUser(user));
   }
 
+  @Test(expected = IllegalStateException.class)
+  public void updateNotExistingUserTest() {
+    Mockito.when(user.getId()).thenReturn(100L);
+    userService.updateUser(user);
+  }
+
   @Test
   public void deleteUserTest() {
-    User user = Mockito.mock(User.class);
-    userService.createUser(user);
-    Assert.assertTrue(userService.deleteUser(user.getId()));
+    Assert.assertTrue(userService.deleteUser(2));
   }
 
   @After
   public void cleanUp() {
-    BookingStorage bookingStorage = context.getBean(BookingStorage.class);
-    bookingStorage.getUsers().clear();
-    bookingStorage.getTickets().clear();
-    bookingStorage.getEvents().clear();
+    bookingStorage.cleanStorage();
   }
 }

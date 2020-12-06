@@ -4,7 +4,9 @@ import dao.UserDaoTest;
 import integration.IntegrationTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import service.*;
+import service.EventServiceTest;
+import service.TicketServiceTest;
+import service.UserServiceTest;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
@@ -14,7 +16,6 @@ import service.*;
   UserServiceTest.class,
   EventServiceTest.class,
   TicketServiceTest.class,
-  BookingFacadeImplTest.class,
   IntegrationTest.class,
 })
 public class TestAll {}

@@ -2,6 +2,7 @@ package dao;
 
 import java.util.List;
 
+/** Interface for data access objects. */
 public interface Dao<T> {
 
   T create(T t);

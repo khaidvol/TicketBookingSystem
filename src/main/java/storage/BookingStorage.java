@@ -40,12 +40,14 @@ public class BookingStorage {
         switch (line[0]) {
           case "User":
             User user = new UserImpl(line[1], line[2]);
+            user.setId(Integer.parseInt(line[3]));
             users.put(user.getId(), user);
             logger.info("User loaded from file: " + user.toString());
             break;
 
           case "Event":
             Event event = new EventImpl(line[1], new SimpleDateFormat("yyyy-MM-dd").parse(line[2]));
+            event.setId(Integer.parseInt(line[3]));
             events.put(event.getId(), event);
             logger.info("Event loaded from file: " + event.toString());
             break;
@@ -57,6 +59,8 @@ public class BookingStorage {
                     Integer.parseInt(line[2]),
                     Integer.parseInt(line[3]),
                     Ticket.Category.valueOf(line[4]));
+            ticket.setId(Integer.parseInt(line[5]));
+            tickets.put(ticket.getId(), ticket);
             logger.info("Ticket loaded from file: " + ticket.toString());
             break;
 
@@ -84,5 +88,11 @@ public class BookingStorage {
 
   public void setAppDataPath(String appDataPath) {
     this.appDataPath = appDataPath;
+  }
+
+  public void cleanStorage() {
+    users.clear();
+    events.clear();
+    tickets.clear();
   }
 }

@@ -2,6 +2,8 @@ package service;
 
 import dao.Dao;
 import model.Event;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -12,8 +14,10 @@ import java.util.List;
 @Service
 public class EventService {
 
+  private static final Log LOGGER = LogFactory.getLog(EventService.class);
   private final Dao<Event> eventDao;
 
+  // constructor-injection
   private EventService(Dao<Event> eventDao) {
     this.eventDao = eventDao;
   }
@@ -22,7 +26,12 @@ public class EventService {
 
     Event event = eventDao.read(eventId);
 
-    if (event == null) throw new IllegalStateException();
+    if (event == null) {
+      LOGGER.error("Event not found.");
+      throw new IllegalStateException();
+    }
+
+    LOGGER.info("Event found: " + event.toString());
 
     return event;
   }
@@ -37,6 +46,9 @@ public class EventService {
       }
     }
 
+    LOGGER.info(String.format("%s event(s) found: ", foundEvents.size()));
+    foundEvents.forEach(LOGGER::info);
+
     return foundEvents;
   }
 
@@ -49,7 +61,6 @@ public class EventService {
     int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
 
     for (Event event : eventDao.readAll()) {
-
       calendar.setTime(event.getDate());
 
       if (calendar.get(Calendar.DAY_OF_WEEK) == dayOfWeek) {
@@ -57,16 +68,17 @@ public class EventService {
       }
     }
 
+    LOGGER.info(String.format("%s event(s) found: ", foundEvents.size()));
+    foundEvents.forEach(LOGGER::info);
+
     return foundEvents;
   }
 
   public Event createEvent(Event event) {
 
-    // set id for event (get current max id from storage)
     event.setId(eventDao.getMaxId() + 1);
-
-    //create event
     eventDao.create(event);
+    LOGGER.info("Event created successfully. Event details: " + event.toString());
 
     return eventDao.read(event.getId());
   }
@@ -74,10 +86,12 @@ public class EventService {
   public Event updateEvent(Event event) {
 
     if (eventDao.read(event.getId()) == null) {
+      LOGGER.error("Event not updated because of not found.");
       throw new IllegalStateException();
     }
 
     eventDao.update(event);
+    LOGGER.info("Event updated successfully. Event details: " + event.toString());
 
     return eventDao.read(event.getId());
   }
@@ -90,6 +104,8 @@ public class EventService {
       eventDao.delete(eventId);
       isEventDeleted = true;
     }
+    LOGGER.info("Event deleted: " + isEventDeleted);
+
     return isEventDeleted;
   }
 }

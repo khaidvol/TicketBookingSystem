@@ -1,6 +1,5 @@
 package service;
 
-import storage.BookingStorage;
 import model.Event;
 import model.Ticket;
 import model.User;
@@ -9,53 +8,58 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import storage.BookingStorage;
 
 public class TicketServiceTest {
 
-  ClassPathXmlApplicationContext context;
+  ApplicationContext context;
+  BookingStorage bookingStorage;
   TicketService ticketService;
+  Ticket ticket;
 
   public TicketServiceTest() {}
 
   @Before
   public void setUp() {
-    context = new ClassPathXmlApplicationContext("applicationContext.xml");
+    context = new ClassPathXmlApplicationContext("applicationContextTest.xml");
     ticketService = context.getBean(TicketService.class);
+    bookingStorage = context.getBean("testingBookingStorage", BookingStorage.class);
+    ticket = Mockito.mock(Ticket.class);
   }
 
   @Test
   public void bookTicketTest() {
-    Assert.assertNotNull(ticketService.bookTicket(2, 2, 2, Ticket.Category.STANDARD));
+    Assert.assertNotNull(ticketService.bookTicket(1, 1, 111, Ticket.Category.STANDARD));
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void bookTicketForAlreadyBookedPlaceTest() {
+    ticketService.bookTicket(1, 1, 1, Ticket.Category.STANDARD);
   }
 
   @Test
   public void getTicketsByUserTest() {
-    ticketService.bookTicket(333, 333, 333, Ticket.Category.STANDARD);
     User user = Mockito.mock(User.class);
-    Mockito.when(user.getId()).thenReturn(333L);
-    Assert.assertEquals(1, ticketService.getBookedTickets(user, 1, 1).size());
+    Mockito.when(user.getId()).thenReturn(1L);
+    Assert.assertEquals(3, ticketService.getBookedTickets(user, 1, 1).size());
   }
 
   @Test
   public void getTicketsByEventTest() {
-    ticketService.bookTicket(666, 666, 666, Ticket.Category.PREMIUM);
     Event event = Mockito.mock(Event.class);
-    Mockito.when(event.getId()).thenReturn(666L);
-    Assert.assertEquals(1, ticketService.getBookedTickets(event, 1, 1).size());
+    Mockito.when(event.getId()).thenReturn(1L);
+    Assert.assertEquals(3, ticketService.getBookedTickets(event, 1, 1).size());
   }
 
   @Test
   public void cancelTicketTest() {
-    Ticket ticket = ticketService.bookTicket(999, 999, 999, Ticket.Category.BAR);
-    Assert.assertTrue(ticketService.cancelTicket(ticket.getId()));
+    Assert.assertTrue(ticketService.cancelTicket(1));
   }
 
   @After
   public void cleanUp() {
-    BookingStorage bookingStorage = context.getBean(BookingStorage.class);
-    bookingStorage.getUsers().clear();
-    bookingStorage.getTickets().clear();
-    bookingStorage.getEvents().clear();
+    bookingStorage.cleanStorage();
   }
 }

@@ -2,6 +2,8 @@ package service;
 
 import dao.Dao;
 import model.User;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -10,8 +12,10 @@ import java.util.List;
 @Service
 public class UserService {
 
+  private static final Log LOGGER = LogFactory.getLog(UserService.class);
   private final Dao<User> userDao;
 
+  // constructor-injection
   private UserService(Dao<User> userDao) {
     this.userDao = userDao;
   }
@@ -20,7 +24,12 @@ public class UserService {
 
     User user = userDao.read(userId);
 
-    if (user == null) throw new IllegalStateException();
+    if (user == null) {
+      LOGGER.error("User not found.");
+      throw new IllegalStateException();
+    }
+
+    LOGGER.info("User found: " + user.toString());
 
     return user;
   }
@@ -29,10 +38,11 @@ public class UserService {
 
     for (User user : userDao.readAll()) {
       if (user.getEmail().equals(email)) {
+        LOGGER.info("User found: " + user.toString());
         return user;
       }
     }
-
+    LOGGER.error("User not found.");
     throw new IllegalStateException();
   }
 
@@ -45,19 +55,24 @@ public class UserService {
         foundUsers.add(user);
       }
     }
+
+    LOGGER.info(String.format("%s user(s) found: ", foundUsers.size()));
+    foundUsers.forEach(LOGGER::info);
+
     return foundUsers;
   }
 
   public User createUser(User user) {
 
-    // set id for user (get current max id from storage)
     user.setId(userDao.getMaxId() + 1);
 
-    // check if email is free
-    if (!isMailFree(user)) throw new IllegalStateException();
+    if (!isMailFree(user)) {
+      LOGGER.error("User not created because of provided email address already used.");
+      throw new IllegalStateException();
+    }
 
-    // create user
     userDao.create(user);
+    LOGGER.info("User created successfully. User details: " + user.toString());
 
     return userDao.read(user.getId());
   }
@@ -65,10 +80,12 @@ public class UserService {
   public User updateUser(User user) {
 
     if (userDao.read(user.getId()) == null || !isMailFree(user)) {
+      LOGGER.error("User not updated because not found or provided email address already used.");
       throw new IllegalStateException();
     }
 
     userDao.update(user);
+    LOGGER.info("User updated successfully. User details: " + user.toString());
 
     return userDao.read(user.getId());
   }
@@ -81,6 +98,8 @@ public class UserService {
       userDao.delete(userId);
       isUserDeleted = true;
     }
+    LOGGER.info("User deleted: " + isUserDeleted);
+
     return isUserDeleted;
   }
 
@@ -93,6 +112,7 @@ public class UserService {
       if (storedUser.getId() != user.getId() && storedUser.getEmail().equals(user.getEmail()))
         isMailFree = false;
     }
+
     return isMailFree;
   }
 }
